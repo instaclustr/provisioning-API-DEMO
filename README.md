@@ -1,6 +1,8 @@
 # provisioning-API-DEMO
 Demo of Instaclustrs Provisioning API
 
+https://www.instaclustr.com/support/api-integrations/api-reference/provisioning-api/
+
 Code for Demonstration of subset of steps using Instaclustr Provisioning API
 
 Created 18 June 2019, Paul Brebner
