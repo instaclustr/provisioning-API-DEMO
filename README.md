@@ -31,6 +31,8 @@ Note that the other java classes are automatically generated from example JSON f
 
 Also used this library for the JSON parsing: https://github.com/FasterXML/jackson-core
 
+And this for the http calls: https://hc.apache.org/
+
 Note that it takes TIME to run (e.g. > 1403s), and this may depend on region, number of nodes, instance sizes, etc, and not all possible exceptions are currently handled (I saw some in dev that weren't documented).
 
 Here are the steps:
