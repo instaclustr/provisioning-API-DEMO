@@ -33,7 +33,7 @@ Also used this library for the JSON parsing: https://github.com/FasterXML/jackso
 
 And this for the http calls: https://hc.apache.org/
 
-Note that it takes TIME to run (e.g. > 1403s), and this may depend on region, number of nodes, instance sizes, etc, and not all possible exceptions are currently handled (I saw some in dev that weren't documented).
+Note that it takes TIME to run (e.g. > 1403s), and this may depend on region, number of nodes, instance sizes, etc, and not all possible exceptions are currently handled.
 
 Here are the steps:
 
@@ -103,3 +103,5 @@ Deleting cluster bbe52fd0-14b0-4582-a5a0-f872fb9d4d34
 Delete Cluster result = {"message":"Cluster has been marked for deletion."}
 
 *** Instaclustr Provisioning API DEMO completed in 1403s, Goodbye!
+
+A New Blog based on this demo is coming soon...
