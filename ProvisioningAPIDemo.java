@@ -28,9 +28,17 @@ public static void main(String[] args) {
 
 		// Create Cluster
 		// args: name, provider name, node size, data centre, cluster network, number of racks, nodes per rack, cassandra Version
-		ClusterID createdClusterID = ProvisioningAPI.createCassandraCluster("DemoCluster1", "AWS_VPC", "resizeable-small(r4-l)", "US_EAST_1", "10.224.0.0/12", "3", "1", "apache-cassandra-3.11.4.ic1");
-	    String id = createdClusterID.getId();
+		// i.e. total nodes = number of racks x nodes per rack
+		// Now using R5 resizeable instances for the demo (changed from r4s)
+		ClusterID createdClusterID = ProvisioningAPI.createCassandraCluster("DemoCluster1", "AWS_VPC", "INSTACLUSTR", "resizeable-small(r5-l)", "US_EAST_1", "10.224.0.0/16", "3", "2", "apache-cassandra-3.11.4.ic2");
+
+		String id = createdClusterID.getId();
 	    System.out.println("STEP 1: Create cluster ID = " + id);	 
+	    if (id == null)
+	    {
+	    		System.out.println("Cluster ID == null, giving up");
+	    		System.exit(1);
+	    }
 	    
 	    // Wait until the cluster is RUNNING
 	    System.out.println("Wait until cluster is running...");
@@ -116,32 +124,23 @@ static void createFirewallRuleDemo(String id, String ip)
     System.out.println("Finished firewall rule create in time = " + time + "s");
 }
 
-	// given a resizeable cluster of resizeable-small(r4-l), resize to next size up, resizeable-small(r4-xl)
+	// given a resizeable cluster of resizeable-small(r5-l), resize to next size up, resizeable-small(r5-xl)
 	// takes id of the cluster
 	static void resizeClusterDemo(String id)
 	{
      // docs https://www.instaclustr.com/instaclustr-dynamic-resizing-for-apache-cassandra/
      // What's concurrent setting do?
      // Nodes can be resized one at a time, or concurrently.  Concurrent resizing allows up to one rack at a time to be replaced for faster overall resizing.
-     // with only 3 racks and 3 nodes this won't speed things up using higher value?
-     // 
-     // resize (not documented) can only resize from small to small or large to large resizeable types
-     // small: resizeable-small(r4-l), resizeable-small(r4-xl), resizeable-small(r4-2xl)	
-     // large: resizearesizeClusterDemoble-large(r4-l), resizeable-large(r4-xl)	, resizeable-large(r4-2xl), resizeable-large(r4-4xl)	
-     /*
-      * POST /provisioning/v1/{clusterId}/{clusterDatacentreId}/resize
-      *
-	{
-	"newNodeSize": "resizeable-small(r4-xl)",
-	"concurrentResizes" : "1",
-	"notifySupportContacts" : "false" 
-	}
-      */
+	 // concurrency=1 is resize by node (1 node at a time), concurrency=2 is resize by rack (2 nodes at a time), and can be higher.
+     
      
 	 ClusterStatus createdClusterStatus = ProvisioningAPI.getClusterStatus(id);
-     List<DataCentre> dataCentres = createdClusterStatus.getDataCentres();
-                  
-     String targetSize = "resizeable-small(r4-xl)";
+     List<DataCentre> dataCentres = createdClusterStatus.getDataCentres();         
+     String targetSize = "resizeable-small(r5-xl)";
+
+     // 1 = by node, 2 = by rack
+     String concurrency = "2";
+     System.out.println("Resize concurrency = " + concurrency);
      
      long startTime = System.currentTimeMillis();
      
@@ -149,7 +148,7 @@ static void createFirewallRuleDemo(String id, String ip)
      for (DataCentre dataCentre : dataCentres)
      {
     	 		double oldProgress = -1.0;
-     		String resizeResult = ProvisioningAPI.resizeDataCentre(id, dataCentre.getId(), "1", targetSize);
+     		String resizeResult = ProvisioningAPI.resizeDataCentre(id, dataCentre.getId(), concurrency, targetSize);
    
      		// sleep 10 s and wait until all nodes are resized and have nodeStatus RUNNING
      		while (true)
